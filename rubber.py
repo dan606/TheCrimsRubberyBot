@@ -58,6 +58,15 @@ class crims_robber():
             self.current_toxic = -1
             return False
 
+    def get_stamina(self):
+        try:
+            self.current_stamina = self.browser.find_element(By.XPATH,'//div[@class="AI8gJpfqwFNYI7UQIdIKXg=="]').value_of_css_property("width")
+            return True
+        except:
+            print("FAILED TO GET STAMINA")
+            self.current_stamina = -1
+            return False
+
     def log_in(self):
         log = self.browser.find_element(By.XPATH,'//input[@placeholder="Username"]')
         pas = self.browser.find_element(By.XPATH,'//input[@name="password"]')
@@ -110,13 +119,10 @@ class crims_robber():
                                 if "100%" in option.text:
                                     last = option.text
                             print("LAST: " + last)
-                            self.current_stamina = self.browser.find_element(By.XPATH, '//div[@class="AI8gJpfqwFNYI7UQIdIKXg=="]').value_of_css_property("width")
-                            print("STAMINA: " + self.current_stamina)
+                            self.get_stamina()
                             self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
                             print("STAMINA: " + str(self.percent_stamina) + "%")
-                            time.sleep(5)
                             select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                            time.sleep(5)
                             if self.percent_stamina > 49:
                                 print("RUBBER")
                                 try:
@@ -156,10 +162,10 @@ class crims_robber():
     def restore_stamina(self):
         self.random_club = random.randint(1,5)
         try:
-            club = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//div[@id="menu-nightlife"]')))
+            club = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-nightlife"]')))
             if club: 
                 club.click()  
-                clubs = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, f'//ul[@class="nightclubs unstyled"]//li[{str(self.random_club)}]//table[@class="table table-condensed"]//button[@class="btn btn-inverse btn-small pull-right"]'))).click()
+                clubs = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, f'//ul[@class="bHz2Cti3p9UxZy4K1UQTQA== unstyled"]//li[{str(self.random_club)}]//*[@class="btn btn-inverse btn btn-inverse btn-small pull-right"]'))).click()
                 if clubs:
                     clubs.click()
         
@@ -168,7 +174,7 @@ class crims_robber():
                 
     
     def restore(self):
-        self.current_stamina = self.browser.find_element_by_xpath('//div[@class="user_profile_progressbar progressbar"]//div[@id="stamina-progressbar"]').value_of_css_property("width")
+        self.get_stamina()
         self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
         try:
             stamina_number = []
