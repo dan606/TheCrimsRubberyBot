@@ -92,7 +92,7 @@ class crims_robber():
                 print('problem with loging in')
     
 
-    def assassult(self):
+    def robbery(self):
         if self.current_toxic == -1:
             print("UNLOADED TOXIC")
             return
@@ -128,16 +128,16 @@ class crims_robber():
                                 try:
                                     WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
                                 except StaleElementReferenceException or ElementClickInterceptedException:
-                                    self.assassult()
+                                    self.robbery()
                             else:
                                 self.restore_stamina()
                                 self.restore()
-                                self.assassult()
+                                self.robbery()
                                 
                                 
 
                 except ElementClickInterceptedException or StaleElementReferenceException:
-                    self.assassult()
+                    self.robbery()
         except:
             raise
 
@@ -152,11 +152,11 @@ class crims_robber():
                         try:
                             heal.click()
                             time.sleep(3)
-                            self.assassult()
+                            self.robbery()
                         except ElementNotInteractableException:
-                            self.assassult()
+                            self.robbery()
                 except ElementClickInterceptedException or StaleElementReferenceException:
-                    self.assassult()
+                    self.robbery()
                     
                         
     def restore_stamina(self):
@@ -182,16 +182,17 @@ class crims_robber():
             stamina_number.extend([float(elem.text[:-1]) for elem in inside_club]) #// saves each element text as float so it can be compared in next step
             try:
                 for i in inside_club:
-                    if float(i.text[:-1]) == max(stamina_number):
-                        needed_to_100 = 100/max(stamina_number)
-                        needed_now = self.percent_stamina/max(stamina_number)
-                        final_score = (needed_to_100 - needed_now)
-                        i.find_element_by_xpath("./following::td/input[@name='quantity']").click()
-                        i.find_element_by_xpath("./following::td/input[@name='quantity']").send_keys(f'{round(final_score)}')
-                        i.find_element_by_xpath("./following::td/button[@class='btn btn-inverse btn-small']").click()
+                    print("CLUB: " + i)
+                    #if float(i.text[:-1]) == max(stamina_number):
+                        #needed_to_100 = 100/max(stamina_number)
+                        #needed_now = self.percent_stamina/max(stamina_number)
+                        #final_score = (needed_to_100 - needed_now)
+                        #i.find_element_by_xpath("./following::td/input[@name='quantity']").click()
+                        #i.find_element_by_xpath("./following::td/input[@name='quantity']").send_keys(f'{round(final_score)}')
+                        #i.find_element_by_xpath("./following::td/button[@class='btn btn-inverse btn-small']").click()
             
             except ElementClickInterceptedException or StaleElementReferenceException:
-                self.assassult()
+                self.robbery()
                
         except TimeoutException:
             self.restore_stamina()
