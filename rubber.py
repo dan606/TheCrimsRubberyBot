@@ -44,8 +44,8 @@ class crims_robber():
             time.sleep(3)
             self.log_in()
             time.sleep(0.5)
-        #while True:
-        self.assassult()
+        while True:
+            self.assassult()
 
         time.sleep(200)
                   
@@ -100,25 +100,25 @@ class crims_robber():
                     if but:
                         but.click()
  
-                        time.sleep(3)
-                        select = WebDriverWait(self.browser, 3000).until(EC.presence_of_all_elements_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']//option")))
-
-                        for option in select:
-                            print(option.text, option.get_attribute('value'))                  
+                        time.sleep(2)
+                        select = Select(WebDriverWait(self.browser, 3000).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']"))))
                     
                         if select: #/// all options available under dropdown
-                            print("IN SELECT")
                             last = None
                             for option in select.options: #// gets last iterator
                                 print(option.text, option.get_attribute('value')) 
-                                if "100" in option.text and "National" in option.text:
+                                if "100%" in option.text:
                                     last = option.text
                             print("LAST: " + last)
-                            self.current_stamina = self.browser.find_element_by_xpath('//div[@id="nightclub-singleassault-attack-19"]//div[@class="AI8gJpfqwFNYI7UQIdIKXg=="]').value_of_css_property("width")
-                            print("STAMINA: " + current_stamina)
+                            self.current_stamina = self.browser.find_element(By.XPATH, '//div[@class="AI8gJpfqwFNYI7UQIdIKXg=="]').value_of_css_property("width")
+                            print("STAMINA: " + self.current_stamina)
                             self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
-                            DropDown.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
+                            print("STAMINA: " + str(self.percent_stamina) + "%")
+                            time.sleep(5)
+                            select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
+                            time.sleep(5)
                             if self.percent_stamina > 49:
+                                print("RUBBER")
                                 try:
                                     WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
                                 except StaleElementReferenceException or ElementClickInterceptedException:
