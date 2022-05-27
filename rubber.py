@@ -137,18 +137,17 @@ class crims_robber():
 
         #//// checks toxiacation and proceeds
     def toxic(self):
-            tox = WebDriverWait(self.browser, 5).until(EC.visibility_of_element_located((By.XPATH, '//div[@id="menu-hospital"]')))
-            if tox:
+            hospital = WebDriverWait(self.browser, 5).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="menu-sprite-hospital"]')))
+            if hospital:
                 try:
-                    tox.click()
-                    heal = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH,"//table[@class='table-top-spacing']//tr//td[2]//button")))
-                    if heal:
-                        try:
-                            heal.click()
-                            time.sleep(3)
-                            self.robbery()
-                        except ElementNotInteractableException:
-                            self.robbery()
+                    hospital.click()
+                    time.sleep(1)
+                    detoxButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Detoxicate for cash']")))
+                    if detoxButton:
+                        detoxButton.click()
+                        time.sleep(1)
+                        self.robbery()
+
                 except ElementClickInterceptedException or StaleElementReferenceException:
                     self.robbery()
                     
