@@ -23,8 +23,7 @@ class crims_robber():
         self.login = login
         self.password = password
 
-
-        try:   
+        try:
             self.browser = uc.Chrome()
             self.browser.get("https://www.thecrims.com/")
         except:
@@ -45,7 +44,10 @@ class crims_robber():
             self.log_in()
             time.sleep(0.5)
         while True:
-            self.assassult()
+            self.robbery()
+#        while True:
+#            self.restore_stamina()
+
 
         time.sleep(200)
                   
@@ -68,7 +70,8 @@ class crims_robber():
             return False
 
     def log_in(self):
-        log = self.browser.find_element(By.XPATH,'//input[@placeholder="Username"]')
+        #log = self.browser.find_element(By.XPATH,'//input[@placeholder="Username"]')
+        log = self.browser.find_element(By.XPATH,'//*[@id="loginform"]/input[1]')
         pas = self.browser.find_element(By.XPATH,'//input[@name="password"]')
         logged = None
         if log:
@@ -131,11 +134,7 @@ class crims_robber():
                                     self.robbery()
                             else:
                                 self.restore_stamina()
-                                self.restore()
                                 self.robbery()
-                                
-                                
-
                 except ElementClickInterceptedException or StaleElementReferenceException:
                     self.robbery()
         except:
@@ -162,17 +161,24 @@ class crims_robber():
     def restore_stamina(self):
         self.random_club = random.randint(1,5)
         try:
-            club = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-nightlife"]')))
-            if club: 
-                club.click()  
-                clubs = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, f'//ul[@class="bHz2Cti3p9UxZy4K1UQTQA== unstyled"]//li[{str(self.random_club)}]//*[@class="btn btn-inverse btn btn-inverse btn-small pull-right"]'))).click()
+            nightlife = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-nightlife"]')))
+            if nightlife: 
+                nightlife.click()
+                time.sleep(1)
+                clubs = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, f'//ul[@class="bHz2Cti3p9UxZy4K1UQTQA== unstyled"]//li[{str(self.random_club)}]//*[@class="btn btn-inverse btn btn-inverse btn-small pull-right"]'))) #.click()
                 if clubs:
                     clubs.click()
-        
+                    time.sleep(1)
+                    buyButton = WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Buy']")))
+                    if buyButton:
+                        buyButton.click()
+                        time.sleep(1)
+                    else:
+                        print("ERRRROR")
         except ElementClickInterceptedException or StaleElementReferenceException:
+            time.sleep(1)
             self.restore_stamina()
                 
-    
     def restore(self):
         self.get_stamina()
         self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
