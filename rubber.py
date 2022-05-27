@@ -167,12 +167,12 @@ class crims_robber():
                     if buyButton:
                         buyButton.click()
                         self.current_stamina = -1
-                        time.sleep(1)
-                        exitButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[text()='Exit']")))
+                        time.sleep(0.5)
+                        exitButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[starts-with(@id, 'exit-button-')]")))
                         if exitButton:
                             print("IN EXIT BUTTON")
                             exitButton.click()
-                            sleep(1)
+                            time.sleep(1)
                     else:
                         self.current_stamina = -1
                         print("ERRRROR")
