@@ -125,7 +125,7 @@ class crims_robber():
                         self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
                         print("STAMINA: " + str(self.percent_stamina) + "%")
                         select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                        if self.percent_stamina > 9:
+                        if self.percent_stamina > 19:
                             print("RUBBER")
                             WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
                         else:
@@ -168,7 +168,7 @@ class crims_robber():
                         buyButton.click()
                         self.current_stamina = -1
                         time.sleep(1)
-                        exitButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[class='btn btn-inverse btn btn-inverse' & text()='Exit']")))
+                        exitButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[text()='Exit']")))
                         if exitButton:
                             print("IN EXIT BUTTON")
                             exitButton.click()
