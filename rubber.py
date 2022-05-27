@@ -125,7 +125,7 @@ class crims_robber():
                         self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
                         print("STAMINA: " + str(self.percent_stamina) + "%")
                         select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                        if self.percent_stamina > 49:
+                        if self.percent_stamina > 0:
                             print("RUBBER")
                             WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
                         else:
