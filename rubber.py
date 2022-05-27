@@ -111,7 +111,8 @@ class crims_robber():
                     print("IN BUT")
                     but.click()
                     time.sleep(2)
-                    select = Select(WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']"))))
+                    robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
+                    select = Select(robberySelection)
                 
                     if select: #/// all options available under dropdown
                         last = None
