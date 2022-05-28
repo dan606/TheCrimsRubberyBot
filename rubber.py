@@ -16,6 +16,7 @@ import os
 import shutil
 import random
 import undetected_chromedriver.v2 as uc
+import sys, getopt
 
 class crims_robber():
     
@@ -111,28 +112,32 @@ class crims_robber():
                     print("IN BUT")
                     but.click()
                     time.sleep(2)
-                    robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
-                    select = Select(robberySelection)
+                    try:
+                        robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
+                        select = Select(robberySelection)
                 
-                    if select: #/// all options available under dropdown
-                        last = None
-                        for option in select.options: #// gets last iterator
-                            print(option.text, option.get_attribute('value')) 
-                            if "100%" in option.text:
-                                last = option.text
-                        print("LAST: " + last)
-                        self.get_stamina()
-                        self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
-                        print("STAMINA: " + str(self.percent_stamina) + "%")
-                        select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                        if self.percent_stamina > 19:
-                            print("RUBBER")
-                            WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
-                        else:
-                            self.restore_stamina()
-                            self.robbery()
+                        if select: #/// all options available under dropdown
+                            last = None
+                            for option in select.options: #// gets last iterator
+                                print(option.text, option.get_attribute('value')) 
+                                if "100%" in option.text:
+                                    last = option.text
+                            print("LAST: " + last)
+                            self.get_stamina()
+                            self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
+                            print("STAMINA: " + str(self.percent_stamina) + "%")
+                            select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
+                            if self.percent_stamina > 19:
+                                print("RUBBER")
+                                WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
+                            else:
+                                self.restore_stamina()
+                                self.robbery()
+                    except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+                        print("IN EXCEPTION 1")
+                        self.robbery()
         except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
-            print("IN EXCEPTION")
+            print("IN EXCEPTION 2")
             self.robbery()
 
         #//// checks toxiacation and proceeds
@@ -204,11 +209,30 @@ class crims_robber():
                
         except TimeoutException:
             self.restore_stamina()
-        
+def main(argv):
+    login = ''
+    password = ''
+    try:
+        opts, args = getopt.getopt(argv,"hl:p:",["login=","password="])
+    except getopt.GetoptError:
+        print('py <py file name> -l <login> -p <password>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('py <py file name> -l <login> -p <password>')
+            sys.exit()
+        elif opt in ("-l", "--login"):
+            login = arg
+        elif opt in ("-p", "--password"):
+            password = arg
+    if not login or not password:
+        print("NO LOGIN OR PASSWORD")
+        sys.exit(2)
+    print ('login: ' + login)
+    print ('password len: ' + len(password))
 
-if __name__ == "__main__":
-    login = "assiniss" #// put your login here
-    password = "dcba7ec5d38a" #// put your password here
+    #login = "assiniss" #// put your login here
+    #password = "dcba7ec5d38a" #// put your password here
     try:
         app = crims_robber(login, password)
     except:
@@ -218,4 +242,7 @@ if __name__ == "__main__":
                     p.kill()
             app = crims_robber(login, password)
         except psutil.NoSuchProcess:
-            app = crims_robber(login, password)
+            app = crims_robber(login, password)   
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
