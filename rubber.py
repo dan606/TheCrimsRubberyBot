@@ -209,17 +209,21 @@ class crims_robber():
                
         except TimeoutException:
             self.restore_stamina()
+
+
+inputParametersText = 'py <py file name> -l <login> -p <password>'
+
 def main(argv):
     login = ''
     password = ''
     try:
         opts, args = getopt.getopt(argv,"hl:p:",["login=","password="])
     except getopt.GetoptError:
-        print('py <py file name> -l <login> -p <password>')
+        print(inputParametersText)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('py <py file name> -l <login> -p <password>')
+            print(inputParametersText)
             sys.exit()
         elif opt in ("-l", "--login"):
             login = arg
@@ -227,10 +231,11 @@ def main(argv):
             password = arg
     if not login or not password:
         print("NO LOGIN OR PASSWORD")
+        print(inputParametersText)
         sys.exit(2)
     print ('login: ' + login)
     print ('password len: ' + str(len(password)))
-    
+
     try:
         app = crims_robber(login, password)
     except:
