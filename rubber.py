@@ -229,8 +229,8 @@ def main(argv):
         print("NO LOGIN OR PASSWORD")
         sys.exit(2)
     print ('login: ' + login)
-    print ('password len: ' + len(password))
-
+    print ('password len: ' + str(len(password)))
+    
     try:
         app = crims_robber(login, password)
     except:
