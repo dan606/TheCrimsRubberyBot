@@ -231,8 +231,6 @@ def main(argv):
     print ('login: ' + login)
     print ('password len: ' + len(password))
 
-    #login = "assiniss" #// put your login here
-    #password = "dcba7ec5d38a" #// put your password here
     try:
         app = crims_robber(login, password)
     except:
