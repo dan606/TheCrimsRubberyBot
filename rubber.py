@@ -48,14 +48,14 @@ class crims_robber():
             self.login()
             if self.current_tickets == -1:
                 self.get_tickets()
-            while self.current_tickets > 110:
+            while self.current_tickets > 1:
                 self.robbery()
             if self.current_stamina < 50:
                 self.restore_stamina()
             self.training()
             self.logout()
             minutesSleep = random.randint(30, 50)
-            print("SLEEP FOR " + minutesSleep + " MIN, TRAING IN PROGRESS, NO TICKETS")
+            print("SLEEP FOR " + str(minutesSleep) + " MIN, TRAING IN PROGRESS, NO TICKETS")
             time.sleep(60* minutesSleep)
 
     def login(self, delay = 2):
