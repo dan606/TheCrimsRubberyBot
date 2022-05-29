@@ -48,8 +48,11 @@ class crims_robber():
             self.login()
             if self.current_tickets == -1:
                 self.get_tickets()
-            while self.current_tickets:
+            while self.current_tickets > 108:
                 self.robbery()
+            if self.current_stamina < 50:
+                self.restore_stamina()
+            self.training()
             self.logout()
             print("SLEEP FOR 1 HOUR, NO TICKETS")
             #time.sleep(67)
@@ -138,6 +141,22 @@ class crims_robber():
         if percent_toxic > 9:
             print("TOXIC > 9, DO DETOX")
             self.detox()
+
+    def training(self):
+        trainigCenterButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-training"]')))
+        if trainigCenterButton:
+            trainigCenterButton.click()
+            time.sleep(2)
+            gymBuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[1]/tbody/tr[2]/td[3]/button")
+            educationBuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")
+            if gymBuyButton:
+                gymBuyButton.click()
+                time.sleep(2)
+                return True
+            
+        else:
+            print("FAILED TO GET TRAINING CENTER")
+            return False
 
     def robbery(self):
         print("AVAILABLE TICKETS: " + str(self.current_tickets))
