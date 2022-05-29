@@ -48,14 +48,15 @@ class crims_robber():
             self.login()
             if self.current_tickets == -1:
                 self.get_tickets()
-            while self.current_tickets > 108:
+            while self.current_tickets > 110:
                 self.robbery()
             if self.current_stamina < 50:
                 self.restore_stamina()
             self.training()
             self.logout()
-            print("SLEEP FOR 1 HOUR, NO TICKETS")
-            #time.sleep(67)
+            minutesSleep = random.randint(30, 50)
+            print("SLEEP FOR " + minutesSleep + " MIN, TRAING IN PROGRESS, NO TICKETS")
+            time.sleep(60* minutesSleep)
 
     def login(self, delay = 2):
         time.sleep(delay)
@@ -82,6 +83,7 @@ class crims_robber():
     def get_toxic(self):
         try:
             self.current_toxic = self.browser.find_element(By.XPATH,'//div[@class="m+0rywACk0dJh3Za1YRM2w=="]').value_of_css_property("width")
+            self.current_toxic = round(100*float(self.current_toxic[:-2])/128)
             return True
         except:
             print("FAILED TO GET TOXIC")
@@ -91,6 +93,7 @@ class crims_robber():
     def get_stamina(self):
         try:
             self.current_stamina = self.browser.find_element(By.XPATH,'//div[@class="AI8gJpfqwFNYI7UQIdIKXg=="]').value_of_css_property("width")
+            self.current_stamina = round(100*float(self.current_stamina[:-2])/128)
             return True
         except:
             print("FAILED TO GET STAMINA")
@@ -137,8 +140,7 @@ class crims_robber():
         if self.current_toxic == -1:
             print("GET TOXICITY")
             self.get_toxic()
-        percent_toxic = round(100*float(self.current_toxic[:-2])/128)
-        if percent_toxic > 9:
+        if self.current_toxic > 9:
             print("TOXIC > 9, DO DETOX")
             self.detox()
 
@@ -146,13 +148,27 @@ class crims_robber():
         trainigCenterButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-training"]')))
         if trainigCenterButton:
             trainigCenterButton.click()
+
+            strength = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[6]/div[2]/span[1]"))).text
+            intelligence = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[6]/div[1]/span[3]").text
+
+            print("STR: " + strength + " INT: " + intelligence)
+
             time.sleep(2)
-            gymBuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[1]/tbody/tr[2]/td[3]/button")
-            educationBuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")
-            if gymBuyButton:
-                gymBuyButton.click()
+            BuyButton = 0
+            if strength < intelligence:
+                # gym button
+                BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[1]/tbody/tr[2]/td[3]/button")
+            else:
+                # education button
+                BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")
+            if BuyButton:
+                BuyButton.click()
                 time.sleep(2)
                 return True
+            else:
+                return False
+                print("FAILED TO GET GYM OR EDUCATION BUTTON")
             
         else:
             print("FAILED TO GET TRAINING CENTER")
@@ -165,7 +181,6 @@ class crims_robber():
             if robberyButton:
                 robberyButton.click()
                 time.sleep(2)
-
                 try:
                     useAllStamina = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), 'Use all stamina')]/input")))
                     if useAllStamina:
@@ -189,10 +204,9 @@ class crims_robber():
                             last = option.text
                     print("SELECTED ROBBERY: " + last)
                     self.get_stamina()
-                    self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
-                    print("STAMINA: " + str(self.percent_stamina) + "%")
+                    print("STAMINA: " + str(self.current_stamina) + "%")
                     select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                    if self.percent_stamina > 19:
+                    if self.current_stamina > 19:
                         print("RUBBER")
                         WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
                     else:
@@ -223,6 +237,13 @@ class crims_robber():
                     
                         
     def restore_stamina(self):
+
+        if self.current_stamina == -1:
+            self.get_stamina()
+        
+        if self.current_stamina > 50:
+            return False
+
         random_club = random.randint(1,7)
         try:
             nightlife = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-nightlife"]')))
@@ -242,21 +263,22 @@ class crims_robber():
                             if exitButton:
                                 exitButton.click()
                                 time.sleep(1)
+                                return True
                             else:
                                 print("FAILED TO EXIT CLUB")
+                                return False
                         else:
                             self.current_stamina = -1
                             print("FAILED TO BUY")
+                            return False
                 except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
                     print("FAILED TO SELECT CLUB")
                     self.current_stamina = -1
-                    time.sleep(1)
-                    self.restore_stamina()
+                    return False
         except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
             print("FAILED TO SELECT NIGHTLIFE")
             self.current_stamina = -1
-            time.sleep(1)
-            self.restore_stamina()
+            return False
 
 inputParametersText = 'py <py file name> -l <login> -p <password>'
 
