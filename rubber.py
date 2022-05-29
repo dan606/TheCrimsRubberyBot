@@ -17,6 +17,11 @@ import shutil
 import random
 import undetected_chromedriver.v2 as uc
 import sys, getopt
+import signal
+
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    sys.exit(0)
 
 class crims_robber():
     
@@ -47,7 +52,7 @@ class crims_robber():
                 self.robbery()
             self.logout()
             print("SLEEP FOR 1 HOUR, NO TICKETS")
-            time.sleep(60*30)
+            #time.sleep(67)
 
     def login(self, delay = 2):
         time.sleep(delay)
@@ -237,6 +242,8 @@ class crims_robber():
 inputParametersText = 'py <py file name> -l <login> -p <password>'
 
 def main(argv):
+    signal.signal(signal.SIGINT, signal_handler)
+
     login = ''
     password = ''
     try:
