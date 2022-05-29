@@ -129,18 +129,25 @@ class crims_robber():
             if percent_toxic > 9:
                 self.toxic()
             else:
-                print("IN ELSE")
-                but = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-robbery"]')))
-                if but:
-                    print("IN BUT")
-                    but.click()
+                robberyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-robbery"]')))
+                if robberyButton:
+                    robberyButton.click()
                     time.sleep(2)
-#                    try:
-                    robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
-                    select = Select(robberySelection)
-#                    except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
-#                        print("IN EXCEPTION 1")
-#                        self.robbery()
+
+                    try:
+                        useAllStamina = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), 'Use all stamina')]/input")))
+                        if useAllStamina:
+                            if(useAllStamina.is_selected() == False):
+                                useAllStamina.click()
+                    except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+                        print("FAILED TO CLICK USE ALL STAMINA")            
+
+                    try:
+                        robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
+                        select = Select(robberySelection)
+                    except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+                        print("FAILED TO SELECT ROBBERY")
+                        self.robbery()
             
                     if select: #/// all options available under dropdown
                         last = None
@@ -148,7 +155,7 @@ class crims_robber():
                             print(option.text, option.get_attribute('value')) 
                             if "100%" in option.text:
                                 last = option.text
-                        print("LAST: " + last)
+                        print("SELECTED ROBBERY: " + last)
                         self.get_stamina()
                         self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
                         print("STAMINA: " + str(self.percent_stamina) + "%")
@@ -157,6 +164,7 @@ class crims_robber():
                             print("RUBBER")
                             WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
                         else:
+                            print("RESTORE STAMINA")
                             self.restore_stamina()
                             self.robbery()
                         self.current_toxic = -1
@@ -182,30 +190,36 @@ class crims_robber():
                     
                         
     def restore_stamina(self):
-        self.random_club = random.randint(3,10)
+        random_club = random.randint(1,7)
         try:
             nightlife = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-nightlife"]')))
             if nightlife: 
                 nightlife.click()
                 time.sleep(1)
-                clubs = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, f'//ul[@class="bHz2Cti3p9UxZy4K1UQTQA== unstyled"]//li[{str(self.random_club)}]//*[@class="btn btn-inverse btn btn-inverse btn-small pull-right"]'))) #.click()
-                if clubs:
-                    clubs.click()
+                try:
+                    clubs = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, f'//ul[@class="bHz2Cti3p9UxZy4K1UQTQA== unstyled"]//li[{str(random_club)}]//*[@class="btn btn-inverse btn btn-inverse btn-small pull-right"]')))
+                    if clubs:
+                        clubs.click()
+                        buyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Buy']")))
+                        if buyButton:
+                            buyButton.click()
+                            self.current_stamina = -1
+                            exitButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[starts-with(@id, 'exit-button-')]")))
+                            if exitButton:
+                                exitButton.click()
+                                time.sleep(1)
+                            else:
+                                print("FAILED TO EXIT CLUB")
+                        else:
+                            self.current_stamina = -1
+                            print("FAILED TO BUY")
+                except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+                    print("FAILED TO SELECT CLUB")
+                    self.current_stamina = -1
                     time.sleep(1)
-                    buyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Buy']")))
-                    if buyButton:
-                        buyButton.click()
-                        self.current_stamina = -1
-                        time.sleep(0.5)
-                        exitButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[starts-with(@id, 'exit-button-')]")))
-                        if exitButton:
-                            print("IN EXIT BUTTON")
-                            exitButton.click()
-                            time.sleep(1)
-                    else:
-                        self.current_stamina = -1
-                        print("ERRRROR")
+                    self.restore_stamina()
         except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+            print("FAILED TO SELECT NIGHTLIFE")
             self.current_stamina = -1
             time.sleep(1)
             self.restore_stamina()
