@@ -31,12 +31,11 @@ class crims_robber():
 
         try:
             self.browser = uc.Chrome()
-            self.browser.get("https://www.thecrims.com/")
         except:
             print("DRIVER FAILED")
 
-        # self.browser = webdriver.Chrome("D:\Projects\HACKS\TC-BOT\chromedriver.exe")
-        # self.browser.get("https://www.thecrims.com/")
+        #self.browser = webdriver.Chrome()
+        self.browser.get("https://www.thecrims.com/")
         self.action = ActionChains(self.browser)
         self.counter = None
         self.current_tickets = -1
@@ -143,6 +142,7 @@ class crims_robber():
             self.detox()
 
     def training(self):
+        self.get_stamina()
         if self.current_stamina < 50:
             self.restore_stamina()
         try:
