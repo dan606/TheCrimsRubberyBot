@@ -20,9 +20,9 @@ import sys, getopt
 
 class crims_robber():
     
-    def __init__(self, login, password, counter=0):
-        self.login = login
-        self.password = password
+    def __init__(self, loginName, loginPassword, counter=0):
+        self.login_name = loginName
+        self.login_password = loginPassword
 
         try:
             self.browser = uc.Chrome()
@@ -36,22 +36,38 @@ class crims_robber():
         self.rob_power = 10
         self.number = 6
         self.counter = None
-
         self.current_toxic = -1
 
-        self.log_in()
-        while self.get_toxic() == False:
-            time.sleep(3)
-            self.log_in()
-            time.sleep(0.5)
+        self.login()
         while True:
+            if self.current_toxic == -1:
+                self.get_toxic()
             self.robbery()
-            time.sleep(1)
-#        while True:
-#            self.restore_stamina()
+            time.sleep(2)
+
+    def login(self, delay = 2):
+        time.sleep(delay)
+        self.log_in()
+        time.sleep(delay)
+        while self.get_tickets() == False:
+            time.sleep(delay)
+            self.log_in()
+            time.sleep(delay)
+        print("LOGIN SUCCESS")
+
+    def logout(self):
+        try:
+            #logoutButton = self.browser.find_element(By.XPATH,"//*[@title='Logout')]")
+            self.browser.get('https://www.thecrims.com/logout')
+            print("LOGOUT SUCCESS")
+            return True
+        except:
+            print("LOGOUT FAILED")
+            return False
                   
     def get_toxic(self):
         try:
+                                                                                 # m+0rywACk0dJh3Za1YRM2w==
             self.current_toxic = self.browser.find_element(By.XPATH,'//div[@class="m+0rywACk0dJh3Za1YRM2w=="]').value_of_css_property("width")
             return True
         except:
@@ -68,6 +84,17 @@ class crims_robber():
             self.current_stamina = -1
             return False
 
+    def get_tickets(self):
+        try:
+            tickets = self.browser.find_element(By.XPATH,"//*[contains(text(), 'Tickets:')]").text
+            self.current_tickets = int(tickets[9:])
+            print("LOADED " + str(self.current_tickets) + " TICKETS")
+            return True
+        except:
+            print("FAILED TO GET TICKETS")
+            self.current_tickets = -1
+            return False
+
     def log_in(self):
         #log = self.browser.find_element(By.XPATH,'//input[@placeholder="Username"]')
         log = self.browser.find_element(By.XPATH,'//*[@id="loginform"]/input[1]')
@@ -76,16 +103,16 @@ class crims_robber():
         if log:
             try:
                 log.clear()
-                log.send_keys(f'{self.login}')
+                log.send_keys(f'{self.login_name}')
             except:
                 print("problem with login")
         if pas:
             try:
                 pas.clear()
-                pas.send_keys(f'{self.password}')
+                pas.send_keys(f'{self.login_password}')
             except:
                 print("problem with password")
-        if log.get_attribute("value") == f'{self.login}' and pas.get_attribute("value") == f'{self.password}':
+        if log.get_attribute("value") == f'{self.login_name}' and pas.get_attribute("value") == f'{self.login_password}':
             try:
                 time.sleep(1)
                 click_but = self.browser.find_element(By.XPATH,'//button[@class="btn btn-large btn-inverse btn-block"]') 
@@ -95,10 +122,6 @@ class crims_robber():
     
 
     def robbery(self):
-        if self.current_toxic == -1:
-            print("UNLOADED TOXIC")
-            return
-
         print("TOXIC: " + self.current_toxic)
 
         percent_toxic = round(100*float(self.current_toxic[:-2])/128)
@@ -112,30 +135,31 @@ class crims_robber():
                     print("IN BUT")
                     but.click()
                     time.sleep(2)
-                    try:
-                        robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
-                        select = Select(robberySelection)
-                
-                        if select: #/// all options available under dropdown
-                            last = None
-                            for option in select.options: #// gets last iterator
-                                print(option.text, option.get_attribute('value')) 
-                                if "100%" in option.text:
-                                    last = option.text
-                            print("LAST: " + last)
-                            self.get_stamina()
-                            self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
-                            print("STAMINA: " + str(self.percent_stamina) + "%")
-                            select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                            if self.percent_stamina > 19:
-                                print("RUBBER")
-                                WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
-                            else:
-                                self.restore_stamina()
-                                self.robbery()
-                    except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
-                        print("IN EXCEPTION 1")
-                        self.robbery()
+#                    try:
+                    robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
+                    select = Select(robberySelection)
+#                    except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+#                        print("IN EXCEPTION 1")
+#                        self.robbery()
+            
+                    if select: #/// all options available under dropdown
+                        last = None
+                        for option in select.options: #// gets last iterator
+                            print(option.text, option.get_attribute('value')) 
+                            if "100%" in option.text:
+                                last = option.text
+                        print("LAST: " + last)
+                        self.get_stamina()
+                        self.percent_stamina = round(100*float(self.current_stamina[:-2])/128)
+                        print("STAMINA: " + str(self.percent_stamina) + "%")
+                        select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
+                        if self.percent_stamina > 19:
+                            print("RUBBER")
+                            WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
+                        else:
+                            self.restore_stamina()
+                            self.robbery()
+                        self.current_toxic = -1
         except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
             print("IN EXCEPTION 2")
             self.robbery()
@@ -158,7 +182,7 @@ class crims_robber():
                     
                         
     def restore_stamina(self):
-        self.random_club = random.randint(1,5)
+        self.random_club = random.randint(3,10)
         try:
             nightlife = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-nightlife"]')))
             if nightlife: 
