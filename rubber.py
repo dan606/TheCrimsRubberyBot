@@ -50,11 +50,9 @@ class crims_robber():
                 self.get_tickets()
             while self.current_tickets > 1:
                 self.robbery()
-            if self.current_stamina < 50:
-                self.restore_stamina()
             self.training()
             self.logout()
-            minutesSleep = random.randint(30, 50)
+            minutesSleep = random.randint(30, 40)
             print("SLEEP FOR " + str(minutesSleep) + " MIN, TRAING IN PROGRESS, NO TICKETS")
             time.sleep(60* minutesSleep)
 
@@ -145,33 +143,58 @@ class crims_robber():
             self.detox()
 
     def training(self):
-        trainigCenterButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-training"]')))
-        if trainigCenterButton:
-            trainigCenterButton.click()
-
-            strength = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[6]/div[2]/span[1]"))).text
-            intelligence = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[6]/div[1]/span[3]").text
-
-            print("STR: " + strength + " INT: " + intelligence)
-
-            time.sleep(2)
-            BuyButton = 0
-            if strength < intelligence:
-                # gym button
-                BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[1]/tbody/tr[2]/td[3]/button")
-            else:
-                # education button
-                BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")
-            if BuyButton:
-                BuyButton.click()
+        if self.current_stamina < 50:
+            self.restore_stamina()
+        try:
+            trainigCenterButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-training"]')))
+            if trainigCenterButton:
+                trainigCenterButton.click()
                 time.sleep(2)
-                return True
+
+                allDiv2Elements = self.browser.find_elements(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[6]/div[2]/span")
+                strength = -1
+                tolerance = -1
+                for e in allDiv2Elements:
+                    if len(e.text):
+                        if strength == -1:
+                            strength = int(e.text)
+                        elif tolerance == -1:
+                            tolerance = int(e.text)
+
+                allDiv1Elements = self.browser.find_elements(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[6]/div[1]/span")
+                intelligence = -1
+                charisma = -1
+                for e in allDiv1Elements:
+                    if len(e.text):
+                        if intelligence == -1:
+                            intelligence = int(e.text)
+                        elif charisma == -1:
+                            charisma = int(e.text)
+
+                print("STR: " + str(strength) + " INT: " + str(intelligence))
+                time.sleep(1)
+
+                BuyButton = 0
+                if strength < intelligence:
+                    # gym button
+                    BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[1]/tbody/tr[2]/td[3]/button")
+                else:
+                    # education button
+                    BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")
+                if BuyButton:
+                    BuyButton.click()
+                    time.sleep(2)
+                    return True
+                else:
+                    return False
+                    print("FAILED TO GET GYM OR EDUCATION BUTTON")
+                
             else:
+                print("FAILED TO GET TRAINING CENTER")
                 return False
-                print("FAILED TO GET GYM OR EDUCATION BUTTON")
-            
-        else:
+        except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
             print("FAILED TO GET TRAINING CENTER")
+            self.training()
             return False
 
     def robbery(self):
@@ -203,10 +226,16 @@ class crims_robber():
                         if "100%" in option.text:
                             last = option.text
                     print("SELECTED ROBBERY: " + last)
+
+                    divider_position = int(last.rfind(" - ", 0))
+                    percentage_position = int(last.rfind("% ", 0))
+                    needed_stamina = -1
+                    if divider_position and percentage_position:
+                        needed_stamina = int(last[divider_position+3:percentage_position])
                     self.get_stamina()
                     print("STAMINA: " + str(self.current_stamina) + "%")
                     select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                    if self.current_stamina > 19:
+                    if self.current_stamina >= needed_stamina:
                         print("RUBBER")
                         WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
                     else:
