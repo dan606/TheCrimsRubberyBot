@@ -160,7 +160,7 @@ class crims_robber():
                 if select: #/// all options available under dropdown
                     last = None
                     for option in select.options: #// gets last iterator
-                        print(option.text, option.get_attribute('value')) 
+                        #print(option.text, option.get_attribute('value')) 
                         if "100%" in option.text:
                             last = option.text
                     print("SELECTED ROBBERY: " + last)
