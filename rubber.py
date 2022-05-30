@@ -116,8 +116,11 @@ class crims_robber():
 
     def log_in(self):
         #log = self.browser.find_element(By.XPATH,'//input[@placeholder="Username"]')
-        log = self.browser.find_element(By.XPATH,'//*[@id="loginform"]/input[1]')
-        pas = self.browser.find_element(By.XPATH,'//input[@name="password"]')
+        try:
+            log = self.browser.find_element(By.XPATH,'//*[@id="loginform"]/input[1]')
+            pas = self.browser.find_element(By.XPATH,'//input[@name="password"]')
+        except:
+            print("problem to find login or password input")
         logged = None
         if log:
             try:
