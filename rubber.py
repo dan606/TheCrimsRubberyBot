@@ -142,9 +142,11 @@ class crims_robber():
             self.detox()
 
     def training(self):
-        self.get_stamina()
-        if self.current_stamina < 50:
-            self.restore_stamina()
+        if self.get_stamina():
+            if self.current_stamina < 50:
+                self.restore_stamina()
+        else:
+            print("FAILED TO GET STAMINA")
         try:
             trainigCenterButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-training"]')))
             if trainigCenterButton:
@@ -177,10 +179,10 @@ class crims_robber():
                 BuyButton = 0
                 if strength < intelligence:
                     # gym button
-                    BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[1]/tbody/tr[2]/td[3]/button")
+                    BuyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[1]/tbody/tr[2]/td[3]/button")))
                 else:
                     # education button
-                    BuyButton = self.browser.find_element(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")
+                    BuyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")))
                 if BuyButton:
                     BuyButton.click()
                     time.sleep(2)
@@ -191,6 +193,7 @@ class crims_robber():
                 
             else:
                 print("FAILED TO GET TRAINING CENTER")
+                self.training()
                 return False
         except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
             print("FAILED TO GET TRAINING CENTER")
