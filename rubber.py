@@ -18,6 +18,7 @@ import random
 import undetected_chromedriver.v2 as uc
 import sys, getopt
 import signal
+from datetime import datetime
 
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
@@ -49,10 +50,14 @@ class crims_robber():
                 self.get_tickets()
             while self.current_tickets > 1:
                 self.robbery()
-            self.training()
+            for i in range(5):
+                if self.training():
+                    break
             self.logout()
             minutesSleep = random.randint(30, 40)
-            print("SLEEP FOR " + str(minutesSleep) + " MIN, TRAING IN PROGRESS, NO TICKETS")
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print(current_time + " SLEEP FOR " + str(minutesSleep) + " MIN, TRAING IN PROGRESS, NO TICKETS")
             time.sleep(60* minutesSleep)
 
     def login(self, delay = 2):
@@ -91,6 +96,7 @@ class crims_robber():
         try:
             self.current_stamina = self.browser.find_element(By.XPATH,'//div[@class="AI8gJpfqwFNYI7UQIdIKXg=="]').value_of_css_property("width")
             self.current_stamina = round(100*float(self.current_stamina[:-2])/128)
+            print("LOADED STAMINA: " + str(self.current_stamina))
             return True
         except:
             print("FAILED TO GET STAMINA")
@@ -142,8 +148,11 @@ class crims_robber():
             self.detox()
 
     def training(self):
+        print("IN TRAINING STAMINA: " + str(self.current_stamina))
         if self.get_stamina():
+            print("IN GET STAMINA")
             if self.current_stamina < 50:
+                print("IN RESTORE")
                 self.restore_stamina()
         else:
             print("FAILED TO GET STAMINA")
@@ -186,7 +195,18 @@ class crims_robber():
                 if BuyButton:
                     BuyButton.click()
                     time.sleep(2)
-                    return True
+
+                    try:
+                        abortButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[text()='Abort']")))
+                        if abortButton:
+                            return True
+                        else:
+                            print("FAILED TO START TRAINING")
+                            return False
+                    except:
+                        print("FAILED TO START TRAINING")
+                        return False
+
                 else:
                     return False
                     print("FAILED TO GET GYM OR EDUCATION BUTTON")
@@ -195,10 +215,11 @@ class crims_robber():
                 print("FAILED TO GET TRAINING CENTER")
                 self.training()
                 return False
-        except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+        except:
             print("FAILED TO GET TRAINING CENTER")
             self.training()
             return False
+        return False
 
     def robbery(self):
         print("AVAILABLE TICKETS: " + str(self.current_tickets))
@@ -212,13 +233,13 @@ class crims_robber():
                     if useAllStamina:
                         if(useAllStamina.is_selected() == False):
                             useAllStamina.click()
-                except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+                except:
                     print("FAILED TO CLICK USE ALL STAMINA")            
 
                 try:
                     robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
                     select = Select(robberySelection)
-                except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+                except:
                     print("FAILED TO SELECT ROBBERY")
                     self.robbery()
         
@@ -247,7 +268,7 @@ class crims_robber():
                         self.checkToxic()
                         self.robbery()
                     self.current_toxic = -1
-        except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+        except:
             print("IN EXCEPTION 2")
             self.robbery()
 
@@ -264,7 +285,7 @@ class crims_robber():
                         self.current_toxic == -1
                         return True
 
-                except ElementClickInterceptedException or StaleElementReferenceException:
+                except:
                     return False
                     
                         
@@ -303,11 +324,11 @@ class crims_robber():
                             self.current_stamina = -1
                             print("FAILED TO BUY")
                             return False
-                except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+                except:
                     print("FAILED TO SELECT CLUB")
                     self.current_stamina = -1
                     return False
-        except ElementClickInterceptedException or StaleElementReferenceException or TimeoutException:
+        except:
             print("FAILED TO SELECT NIGHTLIFE")
             self.current_stamina = -1
             return False
@@ -321,7 +342,7 @@ def main(argv):
     password = ''
     try:
         opts, args = getopt.getopt(argv,"hl:p:",["login=","password="])
-    except getopt.GetoptError:
+    except:
         print(inputParametersText)
         sys.exit(2)
     for opt, arg in opts:
@@ -347,7 +368,7 @@ def main(argv):
                 if "chrome" in p.name():
                     p.kill()
             app = crims_robber(login, password)
-        except psutil.NoSuchProcess:
+        except:
             app = crims_robber(login, password)   
 
 if __name__ == "__main__":
