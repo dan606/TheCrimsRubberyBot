@@ -242,7 +242,7 @@ class crims_robber():
                     select = Select(robberySelection)
                 except:
                     print("FAILED TO SELECT ROBBERY")
-                    self.robbery()
+                    return False
         
                 if select: #/// all options available under dropdown
                     last = None
@@ -267,11 +267,10 @@ class crims_robber():
                         print("RESTORE STAMINA")
                         self.restore_stamina()
                         self.checkToxic()
-                        self.robbery()
                     self.current_toxic = -1
         except:
-            print("IN EXCEPTION 2")
-            self.robbery()
+            print("ROBBERY FAILED")
+            return False
 
     def detox(self):
             hospital = WebDriverWait(self.browser, 5).until(EC.visibility_of_element_located((By.XPATH, '//*[@id="menu-sprite-hospital"]')))
