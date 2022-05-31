@@ -57,7 +57,7 @@ class crims_robber():
             minutesSleep = random.randint(30, 60)
             now = datetime.now()
             current_time = now.strftime("%H:%M:%S")
-            print(current_time + " SLEEP FOR " + str(minutesSleep) + " MIN, TRAING IN PROGRESS, NO TICKETS")
+            print(current_time + " SLEEP FOR " + str(minutesSleep) + " MIN, NO TICKETS")
             time.sleep((60 * minutesSleep) + random.randint(0, 59))
 
     def login(self, delay = 2):
