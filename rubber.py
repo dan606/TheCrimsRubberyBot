@@ -5,82 +5,22 @@ import selenium.webdriver.support.ui as UI
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from selenium.webdriver import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementClickInterceptedException, ElementNotInteractableException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
 import time
-import psutil
-import os
-import shutil
 import random
-import undetected_chromedriver.v2 as uc
-import sys, getopt
-import signal
 from datetime import datetime
-
-def signal_handler(sig, frame):
-    print('You pressed Ctrl+C!')
-    sys.exit(0)
 
 class crims_robber():
     
-    def __init__(self, loginName, loginPassword, counter=0):
-        self.login_name = loginName
-        self.login_password = loginPassword
+    def __init__(self, browser):
+        self.browser = browser
 
-        try:
-            self.browser = uc.Chrome()
-        except:
-            print("DRIVER FAILED")
-
-        #self.browser = webdriver.Chrome()
-        self.browser.get("https://www.thecrims.com/")
-        self.action = ActionChains(self.browser)
-        self.counter = None
         self.current_tickets = -1
         self.current_stamina = -1
         self.current_toxic = -1
-        self.signed_in = False
-
-        while True:
-            self.login(random.uniform(0.5, 3.8))
-            if self.current_tickets == -1:
-                self.get_tickets()
-            while self.current_tickets > 1:
-                self.robbery()
-            for i in range(2):
-                if self.training():
-                    break
-            self.logout()
-            minutesSleep = random.randint(30, 60)
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print(current_time + " SLEEP FOR " + str(minutesSleep) + " MIN, NO TICKETS")
-            time.sleep((60 * minutesSleep) + random.randint(0, 59))
-
-    def login(self, delay = 2):
-        time.sleep(delay)
-        self.log_in()
-        time.sleep(delay)
-        while self.get_tickets() == False:
-            time.sleep(delay)
-            self.log_in()
-            time.sleep(delay)
-        self.signed_in = True
-        print("LOGIN SUCCESS")
-
-    def logout(self):
-        try:
-            #logoutButton = self.browser.find_element(By.XPATH,"//*[@title='Logout')]")
-            self.browser.get('https://www.thecrims.com/logout')
-            self.signed_in = False
-            print("LOGOUT SUCCESS")
-            return True
-        except:
-            print("LOGOUT FAILED")
-            return False
                   
     def get_toxic(self):
         try:
@@ -113,34 +53,6 @@ class crims_robber():
             print("FAILED TO GET TICKETS")
             self.current_tickets = -1
             return False
-
-    def log_in(self):
-        #log = self.browser.find_element(By.XPATH,'//input[@placeholder="Username"]')
-        try:
-            log = self.browser.find_element(By.XPATH,'//*[@id="loginform"]/input[1]')
-            pas = self.browser.find_element(By.XPATH,'//input[@name="password"]')
-        except:
-            print("problem to find login or password input")
-        logged = None
-        if log:
-            try:
-                log.clear()
-                log.send_keys(f'{self.login_name}')
-            except:
-                print("problem with login")
-        if pas:
-            try:
-                pas.clear()
-                pas.send_keys(f'{self.login_password}')
-            except:
-                print("problem with password")
-        if log.get_attribute("value") == f'{self.login_name}' and pas.get_attribute("value") == f'{self.login_password}':
-            try:
-                time.sleep(random.uniform(0.5, 2.5))
-                click_but = self.browser.find_element(By.XPATH,'//button[@class="btn btn-large btn-inverse btn-block"]') 
-                click_but.click()
-            except:
-                print('problem with loging in')
 
     def checkToxic(self):
         if self.current_toxic == -1:
@@ -334,44 +246,3 @@ class crims_robber():
             print("FAILED TO SELECT NIGHTLIFE")
             self.current_stamina = -1
             return False
-
-inputParametersText = 'py <py file name> -l <login> -p <password>'
-
-def main(argv):
-    signal.signal(signal.SIGINT, signal_handler)
-
-    login = ''
-    password = ''
-    try:
-        opts, args = getopt.getopt(argv,"hl:p:",["login=","password="])
-    except:
-        print(inputParametersText)
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print(inputParametersText)
-            sys.exit()
-        elif opt in ("-l", "--login"):
-            login = arg
-        elif opt in ("-p", "--password"):
-            password = arg
-    if not login or not password:
-        print("NO LOGIN OR PASSWORD")
-        print(inputParametersText)
-        sys.exit(2)
-    print ('login: ' + login)
-    print ('password len: ' + str(len(password)))
-
-    try:
-        app = crims_robber(login, password)
-    except:
-        try:
-            for p in psutil.process_iter():
-                if "chrome" in p.name():
-                    p.kill()
-            app = crims_robber(login, password)
-        except:
-            app = crims_robber(login, password)   
-
-if __name__ == "__main__":
-   main(sys.argv[1:])
