@@ -45,20 +45,20 @@ class crims_robber():
         self.signed_in = False
 
         while True:
-            self.login()
+            self.login(random.uniform(0.5, 3.8))
             if self.current_tickets == -1:
                 self.get_tickets()
             while self.current_tickets > 1:
                 self.robbery()
-            for i in range(5):
+            for i in range(2):
                 if self.training():
                     break
             self.logout()
-            minutesSleep = random.randint(30, 40)
+            minutesSleep = random.randint(30, 60)
             now = datetime.now()
             current_time = now.strftime("%H:%M:%S")
             print(current_time + " SLEEP FOR " + str(minutesSleep) + " MIN, TRAING IN PROGRESS, NO TICKETS")
-            time.sleep(60* minutesSleep)
+            time.sleep((60 * minutesSleep) + random.randint(0, 59))
 
     def login(self, delay = 2):
         time.sleep(delay)
@@ -136,7 +136,7 @@ class crims_robber():
                 print("problem with password")
         if log.get_attribute("value") == f'{self.login_name}' and pas.get_attribute("value") == f'{self.login_password}':
             try:
-                time.sleep(1)
+                time.sleep(random.uniform(0.5, 2.5))
                 click_but = self.browser.find_element(By.XPATH,'//button[@class="btn btn-large btn-inverse btn-block"]') 
                 click_but.click()
             except:
@@ -163,7 +163,7 @@ class crims_robber():
             trainigCenterButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-training"]')))
             if trainigCenterButton:
                 trainigCenterButton.click()
-                time.sleep(2)
+                time.sleep(random.uniform(0.5, 2.9))
 
                 allDiv2Elements = self.browser.find_elements(By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[6]/div[2]/span")
                 strength = -1
@@ -186,7 +186,7 @@ class crims_robber():
                             charisma = int(e.text)
 
                 print("STR: " + str(strength) + " INT: " + str(intelligence))
-                time.sleep(1)
+                time.sleep(random.uniform(0.8, 3.8))
 
                 BuyButton = 0
                 if strength < intelligence:
@@ -197,7 +197,7 @@ class crims_robber():
                     BuyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[2]/div/div[3]/table[2]/tbody/tr[2]/td[3]/button")))
                 if BuyButton:
                     BuyButton.click()
-                    time.sleep(2)
+                    time.sleep(random.uniform(1.0, 3.8))
 
                     try:
                         abortButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[text()='Abort']")))
@@ -216,11 +216,9 @@ class crims_robber():
                 
             else:
                 print("FAILED TO GET TRAINING CENTER")
-                self.training()
                 return False
         except:
             print("FAILED TO GET TRAINING CENTER")
-            self.training()
             return False
         return False
 
@@ -230,7 +228,7 @@ class crims_robber():
             robberyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-robbery"]')))
             if robberyButton:
                 robberyButton.click()
-                time.sleep(2)
+                time.sleep(random.uniform(0.5, 3.8))
                 try:
                     useAllStamina = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), 'Use all stamina')]/input")))
                     if useAllStamina:
@@ -280,11 +278,11 @@ class crims_robber():
             if hospital:
                 try:
                     hospital.click()
-                    time.sleep(1)
+                    time.sleep(random.uniform(0.5, 1.9))
                     detoxButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Detoxicate for cash']")))
                     if detoxButton:
                         detoxButton.click()
-                        time.sleep(1)
+                        time.sleep(random.uniform(0.9, 2.9))
                         self.current_toxic == -1
                         return True
 
@@ -305,20 +303,22 @@ class crims_robber():
             nightlife = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-nightlife"]')))
             if nightlife: 
                 nightlife.click()
-                time.sleep(1)
+                time.sleep(random.uniform(0.5, 3.8))
                 try:
                     clubs = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, f'//ul[@class="bHz2Cti3p9UxZy4K1UQTQA== unstyled"]//li[{str(random_club)}]//*[@class="btn btn-inverse btn btn-inverse btn-small pull-right"]')))
                     if clubs:
                         clubs.click()
+                        random.uniform(0.3, 1.9)
                         buyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Buy']")))
                         if buyButton:
                             buyButton.click()
+                            random.uniform(0.3, 1.9)
                             self.current_stamina = -1
                             self.current_tickets -= 1
                             exitButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[starts-with(@id, 'exit-button-')]")))
                             if exitButton:
                                 exitButton.click()
-                                time.sleep(1)
+                                time.sleep(random.uniform(0.5, 3.8))
                                 return True
                             else:
                                 print("FAILED TO EXIT CLUB")
