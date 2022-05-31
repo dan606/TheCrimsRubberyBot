@@ -218,7 +218,7 @@ class crims_robber():
                 print("FAILED TO GET TRAINING CENTER")
                 return False
         except:
-            print("FAILED TO GET TRAINING CENTER")
+            print("TRAINING FAILED")
             return False
         return False
 
