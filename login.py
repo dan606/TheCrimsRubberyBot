@@ -18,40 +18,61 @@ class login():
     def login(self, delay = 2):
         #log = self.browser.find_element(By.XPATH,'//input[@placeholder="Username"]')
         try:
-            log = self.browser.find_element(By.XPATH,'//*[@id="loginform"]/input[1]')
+            log = self.browser.find_element(By.XPATH,'//input[@name="username"]')
             pas = self.browser.find_element(By.XPATH,'//input[@name="password"]')
-        except:
-            logger.error("problem to find login or password input")
-        logged = None
-        if log:
+
+            if log:
+                try:
+                    log.clear()
+                    log.send_keys(f'{self.login_name}')
+                except:
+                    logger.error("problem with login name")
+                    return False
+            if pas:
+                try:
+                    pas.clear()
+                    pas.send_keys(f'{self.login_password}')
+                except:
+                    logger.error("problem with password")
+                    return False
+            #if log.get_attribute("value") == f'{self.login_name}' and pas.get_attribute("value") == f'{self.login_password}':
             try:
-                log.clear()
-                log.send_keys(f'{self.login_name}')
-            except:
-                logger.error("problem with login")
-        if pas:
-            try:
-                pas.clear()
-                pas.send_keys(f'{self.login_password}')
-            except:
-                logger.error("problem with password")
-        if log.get_attribute("value") == f'{self.login_name}' and pas.get_attribute("value") == f'{self.login_password}':
-            try:
-                time.sleep(random.uniform(0.5, 2.5))
-                click_but = self.browser.find_element(By.XPATH,'//button[@class="btn btn-large btn-inverse btn-block"]')
-                click_but.click()
-                logger.info("SIGNED IN")
+                time.sleep(delay)
+                #click_but = self.browser.find_element(By.XPATH,'//button[@class="btn btn-large btn-inverse btn-block"]')
+                click_but = self.browser.find_element(By.XPATH,'//button[@type="submit"]')
+                if click_but:
+                    click_but.click()
+                else:
+                    print("LAMA")
+                return self.checkIsSignedin()
             except:
                 logger.error('problem with loging in')
+                return False
+        except:
+            logger.error("problem to find login or password input")
+            return False
 
     def logout(self):
         try:
-            #logoutButton = self.browser.find_element(By.XPATH,"//*[@title='Logout')]")
             self.browser.get('https://www.thecrims.com/logout')
             self.is_signedin = False
             print("LOGOUT SUCCESS")
             return True
         except:
             print("LOGOUT FAILED")
+            return False
+
+    def checkIsSignedin(self):
+        try:
+            logoutButton = WebDriverWait(self.browser, random.uniform(1.3, 3.9)).until(EC.presence_of_element_located((By.XPATH,'//div[@class="m+0rywACk0dJh3Za1YRM2w=="]')))
+            if logoutButton:
+                self.is_signedin = True
+                print("SIGNED IN")
+                return True
+            else:
+                self.is_signedin = False
+                return False
+        except:
+            self.is_signedin = False
             return False
 
