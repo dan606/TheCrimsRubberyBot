@@ -49,23 +49,24 @@ def main(argv):
 #            time.sleep(2)
             Login = login(loginName, password, browser)
             Robber = crims_robber(browser)
+            Stats = stats(browser)
 
             logger.info("BOT inicialized")
 
             while True:
                 Login.login(random.uniform(0.5, 3.8))
+                while Login.is_signedin == False:
+                    time.uniform(1, 2.9)
+                    Login.login(random.uniform(0.5, 3.8))
                 
-                time.sleep(10)
-                Login.logout()
-                time.sleep(5)
-                if self.current_tickets == -1:
-                    self.get_tickets()
-                while self.current_tickets > 1:
-                    self.robbery()
+                if Stats.current_tickets == -1:
+                    Stats.get_tickets()
+                while Stats.current_tickets > 1:
+                    Robber.robbery()
                 for i in range(2):
-                    if self.training():
+                    if Robber.training():
                         break
-                self.logout()
+                Login.logout()
                 minutesSleep = random.randint(30, 60)
                 now = datetime.now()
                 current_time = now.strftime("%H:%M:%S")
