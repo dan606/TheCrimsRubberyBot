@@ -1,4 +1,5 @@
 from logger import *
+from login import *
 from rubber import *
 from tasks import *
 
@@ -45,20 +46,15 @@ def main(argv):
             browser.get("https://www.thecrims.com/")
             action = ActionChains(browser)
 
-            time.sleep(2)
-
-            logger.info("INIT 1")
-
-            Login = login(loginName, password, browser)              
-
-            logger.info("INIT 2")
-
+#            time.sleep(2)
+            Login = login(loginName, password, browser)
             Robber = crims_robber(browser)
 
             logger.info("BOT inicialized")
 
             while True:
                 Login.login(random.uniform(0.5, 3.8))
+                
                 time.sleep(10)
                 Login.logout()
                 time.sleep(5)
