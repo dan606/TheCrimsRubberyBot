@@ -67,7 +67,6 @@ class login():
             logoutButton = WebDriverWait(self.browser, random.uniform(1.3, 3.9)).until(EC.presence_of_element_located((By.XPATH,'//div[@class="m+0rywACk0dJh3Za1YRM2w=="]')))
             if logoutButton:
                 self.is_signedin = True
-                print("SIGNED IN")
                 return True
             else:
                 self.is_signedin = False

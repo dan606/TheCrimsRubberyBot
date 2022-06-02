@@ -66,9 +66,7 @@ def main(argv):
         while Login.login(random.uniform(0.5, 3.8)) == False:
             time.sleep(random.uniform(1.5, 2.9))
         
-        if Stats.current_tickets == -1:
-            Stats.get_tickets()
-        while Stats.current_tickets > 1:
+        while Stats.get_tickets() > 1:
             Robber.robbery()
         for i in range(2):
             if Robber.training():
