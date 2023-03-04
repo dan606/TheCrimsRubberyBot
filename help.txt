@@ -2,3 +2,4 @@ wildcards in xpath
 
 //input[starts-with(@id, 'activation:') and contains(@id, ':voId:1')]
 //input[matches(@id, 'activation:.*:voId:1')]
+
