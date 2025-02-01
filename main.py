@@ -6,7 +6,7 @@ from stats import *
 
 import sys, getopt, signal, psutil
 from selenium.webdriver import ActionChains
-import undetected_chromedriver.v2 as uc
+import undetected_chromedriver as uc
 import random
 
 def signal_handler(sig, frame):

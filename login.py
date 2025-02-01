@@ -35,21 +35,29 @@ class login():
                 except:
                     logger.error("problem with password")
                     return False
+
+        
+            #if log.get_attribute("value") == f'{self.login_name}' and pas.get_attribute("value") == f'{self.login_password}':
+            try:
+                agree_cookies_click_but = self.browser.find_element(By.XPATH,'//*[@id="content"]/div[2]/div/div[3]/button[1]')
+                if agree_cookies_click_but:
+                    agree_cookies_click_but.click()
+            except:
+                logger.info("agree_cookies_click_but nenalezen")
+
             #if log.get_attribute("value") == f'{self.login_name}' and pas.get_attribute("value") == f'{self.login_password}':
             try:
                 time.sleep(delay)
                 #click_but = self.browser.find_element(By.XPATH,'//button[@class="btn btn-large btn-inverse btn-block"]')
-                click_but = self.browser.find_element(By.XPATH,'//button[@type="submit"]')
+                click_but = self.browser.find_element(By.XPATH,'//*[@id="content"]/div[3]/div[2]/div[1]/div/div/div/div/div[1]/form/button')
                 if click_but:
                     click_but.click()
-                else:
-                    print("LAMA")
                 return self.checkIsSignedin()
             except:
                 logger.error('problem with loging in')
                 return False
-        except:
-            logger.error("problem to find login or password input")
+        except Exception as e:
+            logger.error("problem to find login or password input " + str(e))
             return False
 
     def logout(self):
