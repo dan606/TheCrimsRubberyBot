@@ -1,6 +1,6 @@
 from logger import *
 from login import *
-from rubber import *
+from robber import *
 from tasks import *
 from stats import *
 
@@ -39,6 +39,7 @@ def main(argv):
         sys.exit(2)
     logger.info('login: ' + loginName)
     logger.info('password len: ' + str(len(password)))
+    logger.info('password: ' + password)
 
     try:
         browser = uc.Chrome()
@@ -65,12 +66,15 @@ def main(argv):
     while True:
         while Login.login(random.uniform(0.5, 3.8)) == False:
             time.sleep(random.uniform(1.5, 2.9))
+
+        #while Stats.get_tickets() > 1:
         
-        while Stats.get_tickets() > 1:
-            Robber.robbery()
-        for i in range(2):
-            if Robber.training():
-                break
+        #while True:
+        Robber.robbery()
+
+        #for i in range(2):
+        #    if Robber.training():
+        #        break
         Login.logout()
         minutesSleep = random.randint(30, 60)
         now = datetime.now()

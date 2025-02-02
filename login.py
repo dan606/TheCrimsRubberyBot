@@ -57,7 +57,7 @@ class login():
                 logger.error('problem with loging in')
                 return False
         except Exception as e:
-            logger.error("problem to find login or password input " + str(e))
+            logger.error("problem to find login or password input")
             return False
 
     def logout(self):
@@ -72,7 +72,7 @@ class login():
 
     def checkIsSignedin(self):
         try:
-            logoutButton = WebDriverWait(self.browser, random.uniform(1.3, 3.9)).until(EC.presence_of_element_located((By.XPATH,'//div[@class="m+0rywACk0dJh3Za1YRM2w=="]')))
+            logoutButton = WebDriverWait(self.browser, random.uniform(1.3, 3.9)).until(EC.presence_of_element_located((By.XPATH,'//*[@id="pv_id_2"]/div[2]/div/div[2]/button')))
             if logoutButton:
                 self.is_signedin = True
                 return True

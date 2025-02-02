@@ -36,17 +36,6 @@ class crims_robber():
             self.current_stamina = -1
             return False
 
-    def get_tickets(self):
-        try:
-            tickets = self.browser.find_element(By.XPATH,"//*[contains(text(), 'Tickets:')]").text
-            self.current_tickets = int(tickets[9:])
-            print("LOADED " + str(self.current_tickets) + " TICKETS")
-            return True
-        except:
-            print("FAILED TO GET TICKETS")
-            self.current_tickets = -1
-            return False
-
     def checkToxic(self):
         if self.current_toxic == -1:
             print("GET TOXICITY")
@@ -57,49 +46,64 @@ class crims_robber():
 
     def robbery(self):
         try:
-            robberyButton = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-sprite-robbery"]')))
+            robberyButton = WebDriverWait(self.browser, 6).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="menu-robbery"]/div')))
             if robberyButton:
                 robberyButton.click()
-                time.sleep(random.uniform(0.5, 3.8))
-                try:
-                    useAllStamina = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[contains(text(), 'Use all stamina')]/input")))
-                    if useAllStamina:
-                        if(useAllStamina.is_selected() == False):
-                            useAllStamina.click()
-                except:
-                    print("FAILED TO CLICK USE ALL STAMINA")            
+                time.sleep(random.uniform(2, 4))
 
-                try:
-                    robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, "//*[@id='singlerobbery-select-robbery']")))
-                    select = Select(robberySelection)
-                except:
-                    print("FAILED TO SELECT ROBBERY")
-                    return False
+
+                # try:
+                #     robberySelection = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located((By.XPATH, '//*[@id="listbox-null"]')))
+                #     select = Select(robberySelection)
+                # except:
+                #     print("FAILED TO SELECT ROBBERY")
+                #     return False
+
+
+                dropdown = self.browser.find_element(By.CLASS_NAME, "multiselect__content-wrapper")
+                self.browser.execute_script("arguments[0].style.display = 'block';", dropdown)  # Otevření dropdownu
+
+                # Najít všechny možnosti
+                options = self.browser.find_elements(By.CLASS_NAME, "multiselect__element")
+
+                # Kliknutí na všechny možnosti pro výběr
+                lastText = None
+                lastOpt = None
+                for option in options:
+                    if "100%" in option.text:
+                        lastText = option.text
+                        lastOpt = option
         
-                if select: #/// all options available under dropdown
-                    last = None
-                    for option in select.options: #// gets last iterator
-                        #print(option.text, option.get_attribute('value')) 
-                        if "100%" in option.text:
-                            last = option.text
-                    print("SELECTED ROBBERY: " + last)
+                if lastText and lastOpt:
+                    lastOpt.click()
+                    print("SELECTED ROBBERY: " + lastText)
+                    try:
+                        useAllStamina = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="full"]')))
+                        if useAllStamina:
+                            if(useAllStamina.is_selected() == False):
+                                useAllStamina.click()
+                    except:
+                        print("FAILED TO CLICK USE ALL STAMINA")       
 
-                    divider_position = int(last.rfind(" - ", 0))
-                    percentage_position = int(last.rfind("% ", 0))
-                    needed_stamina = -1
-                    if divider_position and percentage_position:
-                        needed_stamina = int(last[divider_position+3:percentage_position])
-                    self.get_stamina()
-                    print("STAMINA: " + str(self.current_stamina) + "%")
-                    select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
-                    if self.current_stamina >= needed_stamina:
-                        print("RUBBER")
-                        WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//tr//table//tr//button[@id='singlerobbery-rob']"))).click()
-                    else:
-                        print("RESTORE STAMINA")
-                        self.restore_stamina()
-                        self.checkToxic()
-                    self.current_toxic = -1
+                print("ROBB")
+                WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="single-robbery-dropdown"]/button'))).click()     
+
+                    # divider_position = int(last.rfind(" - ", 0))
+                    # percentage_position = int(last.rfind("% ", 0))
+                    # needed_stamina = -1
+                    # if divider_position and percentage_position:
+                    #     needed_stamina = int(last[divider_position+3:percentage_position])
+                    # self.get_stamina()
+                    # print("STAMINA: " + str(self.current_stamina) + "%")
+                    # select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
+                    # if self.current_stamina >= needed_stamina:
+                    #     print("ROBBER")
+                    #     WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="single-robbery-dropdown"]/button'))).click()
+                    # else:
+                    #     print("RESTORE STAMINA")
+                    #     self.restore_stamina()
+                    #     self.checkToxic()
+                    # self.current_toxic = -1
         except:
             print("ROBBERY FAILED")
             return False
