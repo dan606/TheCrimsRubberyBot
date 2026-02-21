@@ -68,6 +68,7 @@ def main(argv):
             time.sleep(random.uniform(1.5, 2.9))
 
         #while Stats.get_tickets() > 1:
+        Stats.get_tickets()
         
         #while True:
         Robber.robbery()

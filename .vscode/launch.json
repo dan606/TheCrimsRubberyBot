@@ -10,10 +10,7 @@
             "request": "launch",
             "program": "main.py",
             "console": "integratedTerminal",
-            "args": [
-                "-l","dgoga",
-                "-p","h1y2Y4L47XJ8"
-            ]
+            "args": ["-l", "dgoga", "-p", "Dan606"]
         }
     ]
 }

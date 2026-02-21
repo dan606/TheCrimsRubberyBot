@@ -1,4 +1,5 @@
 from selenium.webdriver.common.by import By
+from logger import *
 
 from dataclasses import dataclass
 
@@ -21,34 +22,28 @@ class stats():
             current_toxic = round(100*float(current_toxic[:-2])/128)
             return current_toxic
         except:
-            print("FAILED TO GET TOXIC")
+            logger.error("FAILED TO GET TOXIC")
             return -1
 
     def get_stamina(self):
         try:
             current_stamina = self.browser.find_element(By.XPATH,'//div[@class="AI8gJpfqwFNYI7UQIdIKXg=="]').value_of_css_property("width")
             current_stamina = round(100*float(current_stamina[:-2])/128)
-            print("LOADED STAMINA: " + str(current_stamina))
+            logger.info("LOADED STAMINA: " + str(current_stamina))
             return current_stamina
         except:
-            print("FAILED TO GET STAMINA")
+            logger.error("FAILED TO GET STAMINA")
             return -1
 
     def get_tickets(self):
         try:
-            tickets = self.browser.find_element(By.XPATH,"//*[contains(text(), 'Tickets:')]").text
-            current_tickets = int(tickets[9:])
-            print("LOADED " + str(current_tickets) + " TICKETS")
+            tickets = self.browser.find_element(By.XPATH,'//*[@id="username-char-respect"]/div[2]/div[2]/div').text
+            current_tickets = int(tickets)
+            logger.info("LOADED " + str(current_tickets) + " TICKETS")
             return current_tickets
         except:
-            tickets = self.browser.find_element(By.XPATH,"/html/body/div[2]/div[4]/div/table/tbody/tr/td[1]/div[2]/table/tbody/tr/td/div[3]/div/div[1]/div[1]/div[12]/span").text
-            if tickets:
-                current_tickets = int(tickets)
-                print("LOADED METHOD 2 " + str(current_tickets) + " TICKETS")
-                return current_tickets
-            else:
-                print("FAILED TO GET TICKETS")
-                return -1
+            logger.error('FAILED TO LOAD TICKETS')
+            return -1
 
     def get_stats(self):
 
