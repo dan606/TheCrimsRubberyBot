@@ -250,13 +250,23 @@ class crims_robber():
                         #print(option.text, option.get_attribute('value')) 
                         if "100%" in option.text:
                             last = option.text
+                    if last is None:
+                        print("NO 100% ROBBERY OPTION AVAILABLE")
+                        return False
                     print("SELECTED ROBBERY: " + last)
 
                     divider_position = int(last.rfind(" - ", 0))
                     percentage_position = int(last.rfind("% ", 0))
                     needed_stamina = -1
-                    if divider_position and percentage_position:
-                        needed_stamina = int(last[divider_position+3:percentage_position])
+                    if divider_position != -1 and percentage_position != -1 and divider_position < percentage_position:
+                        try:
+                            needed_stamina = int(last[divider_position+3:percentage_position])
+                        except ValueError:
+                            print("FAILED TO PARSE NEEDED STAMINA")
+                            return False
+                    else:
+                        print("FAILED TO PARSE NEEDED STAMINA")
+                        return False
                     self.get_stamina()
                     print("STAMINA: " + str(self.current_stamina) + "%")
                     select.select_by_visible_text(last) #//// picks the last element with 100% of chance to rob
@@ -282,7 +292,7 @@ class crims_robber():
                     if detoxButton:
                         detoxButton.click()
                         time.sleep(random.uniform(0.9, 2.9))
-                        self.current_toxic == -1
+                        self.current_toxic = -1
                         return True
 
                 except:
